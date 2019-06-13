@@ -126,5 +126,8 @@ systemctl restart samba-ad-dc
 
 # TODO install the NTP daemon chrony.
 
+# try listing the smb shares.
+echo $config_administrator_password | smbclient --list=localhost --user=Administrator
+
 # try the DNS.
 dig axfr $config_realm
