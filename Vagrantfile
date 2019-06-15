@@ -45,5 +45,6 @@ Vagrant.configure('2') do |config|
     config.vm.provision :shell, path: 'windows/provision-firewall.ps1'
     config.vm.provision :shell, path: 'windows/provision-remote-administration-tools.ps1'
     # TODO install Apache Directory Studio
+    config.vm.provision :shell, path: 'windows/summary.ps1'
   end
 end
