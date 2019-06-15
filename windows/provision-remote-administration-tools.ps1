@@ -1,5 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
+# NB Samba has no Active Directory Web Services (ADWS) implementation,
+#    so you cannot use Active Directory Administrative Center.
 @(
     'RSAT-AD-PowerShell'    # Active Directory module for Windows PowerShell
     'RSAT-ADDS-Tools'       # AD DS Snap-Ins and Command-Line Tools
