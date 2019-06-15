@@ -11,6 +11,7 @@ config_administrator_password=HeyH0Password
 
 #
 # install samba.
+# see https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller
 # see https://help.ubuntu.com/lts/serverguide/samba-dc.html.en
 # see https://samba.tranquil.it/doc/en/samba_config_server/debian/server_install_samba_debian.html
 #
@@ -39,12 +40,16 @@ cat >/etc/krb5.conf <<EOF
 EOF
 
 # configure samba.
+# NB since we are using a vagrant environment Samba should not listen on the default
+#    NAT vagrant network, so we only bind the eth1 (and lo) interface.
 rm -f /etc/samba/smb.conf
 samba-tool domain provision \
     --realm=$config_realm \
     --domain=$config_domain \
     --site=$config_domain \
-    --server-role=dc
+    --server-role=dc \
+    --option='interfaces=lo eth1' \
+    --option='bind interfaces only=yes'
 samba-tool user setpassword administrator --newpassword=$config_administrator_password
 rm -f /var/lib/samba/private/krb5.conf
 ln -s /etc/krb5.conf /var/lib/samba/private/krb5.conf
