@@ -130,7 +130,47 @@ sed -i -E 's,^(OPTIONS=).+,\1"-4 -u bind",' /etc/default/bind9
 systemctl restart bind9
 systemctl restart samba-ad-dc
 
-# TODO install the NTP daemon chrony.
+#
+# install the NTP daemon and integrate it with samba.
+# see https://wiki.samba.org/index.php/Time_Synchronisation
+# see https://chrony.tuxfamily.org/doc/3.2/chrony.conf.html
+# see https://chrony.tuxfamily.org/doc/3.2/chronyd.html
+# see https://chrony.tuxfamily.org/doc/3.2/chronyc.html
+
+apt-get install -y chrony
+
+# only use IPv4.
+# NB unfortunately this will not prevent some IPv6 warnings like:
+#       chronyd[2361]: Could not open IPv6 NTP socket : Address family not supported by protocol
+sed -i -E 's,^(DAEMON_OPTS=)"(.*)",\1"-4 \2",' /etc/default/chrony 
+
+# integrate with samba.
+cat >>/etc/chrony/chrony.conf <<EOF
+
+# NB you might need to configure the upstream ntp server pool.
+
+# allow all networks to access this chrony ntp server.
+allow all
+
+# let samba sign the MS-SNTP responses.
+ntpsigndsocket /var/lib/samba/ntp_signd
+EOF
+
+# make sure chrony can access the samba socket directory (the socket file is
+# created inside with permissions to everyone).
+chgrp _chrony /var/lib/samba/ntp_signd
+
+# restart chrony for it to pickup the changes.
+systemctl restart chrony
+
+# wait for it to sync.
+chronyc waitsync
+
+# try chrony.
+chronyc tracking
+chronyc sources
+chronyc clients
+chronyc serverstats
 
 # try listing the smb shares.
 echo $config_administrator_password | smbclient --list=localhost --user=Administrator
