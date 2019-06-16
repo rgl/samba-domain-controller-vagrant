@@ -131,7 +131,9 @@ sed -i -E 's,^(OPTIONS=).+,\1"-4 -u bind",' /etc/default/bind9
 systemctl restart bind9
 systemctl restart samba-ad-dc
 
-# as an example, add a reverve dns zone for our network and hosts.
+# add a reverve dns zone for our network and hosts.
+# NB this zone is automatically managed by each computer as it boots.
+# see https://wiki.samba.org/index.php/DNS_Administration
 samba-tool dns zonecreate localhost 56.168.192.in-addr.arpa --username=Administrator%$config_administrator_password
 samba-tool dns add localhost 56.168.192.in-addr.arpa 2 ptr dc.example.com --username=Administrator%$config_administrator_password
 
