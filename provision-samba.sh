@@ -138,6 +138,12 @@ systemctl restart samba-ad-dc
 # see https://chrony.tuxfamily.org/doc/3.2/chronyd.html
 # see https://chrony.tuxfamily.org/doc/3.2/chronyc.html
 
+# disable systemd-timesyncd so it doesn't try to sync the time.
+# the time sync will be handled by chrony.
+systemctl stop systemd-timesyncd
+systemctl disable systemd-timesyncd
+
+# install chrony.
 apt-get install -y chrony
 
 # only use IPv4.
