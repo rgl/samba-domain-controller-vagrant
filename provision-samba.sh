@@ -99,7 +99,8 @@ cat >/etc/apparmor.d/local/usr.sbin.named <<'EOF'
 /usr/lib/x86_64-linux-gnu/samba/**/*.so m,
 /usr/lib/x86_64-linux-gnu/ldb/**/*.so m,
 /var/lib/samba/private/dns/** rwk,
-/var/lib/samba/private/dns.keytab r,
+/var/lib/samba/private/dns.keytab rwk,
+/dev/urandom rw,
 EOF
 systemctl reload apparmor
 sed -i -E 's,^(\s*)#?(dns forwarder =.+),\1#\2\n\1server services = -dns,' /etc/samba/smb.conf
