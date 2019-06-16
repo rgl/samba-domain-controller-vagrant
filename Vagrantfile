@@ -27,24 +27,26 @@ Vagrant.configure('2') do |config|
     config.vm.provision :reload
   end
 
-  config.vm.define :windows do |config|
-    config.vm.box = 'windows-2019-amd64'
-    config.vm.provider :libvirt do |lv|
-      lv.memory = 4*1024
-      config.vm.synced_folder '.', '/vagrant', type: 'smb', smb_username: ENV['USER'], smb_password: ENV['VAGRANT_SMB_PASSWORD']
+  ['2019', '10'].each_with_index do |v, i|
+    config.vm.define "windows#{v}" do |config|
+      config.vm.box = "windows-#{v}-amd64"
+      config.vm.provider :libvirt do |lv|
+        lv.memory = 2*1024
+        config.vm.synced_folder '.', '/vagrant', type: 'smb', smb_username: ENV['USER'], smb_password: ENV['VAGRANT_SMB_PASSWORD']
+      end
+      config.vm.provider :virtualbox do |vb|
+        vb.memory = 2*1024
+      end
+      config.vm.hostname = "windows#{v}"
+      config.vm.network 'private_network', ip: "192.168.56.#{3+i}", libvirt__forward_mode: 'route', libvirt__dhcp_enabled: false
+      # config.vm.provision 'windows-sysprep'
+      config.vm.provision :shell, path: 'windows/locale.ps1'
+      config.vm.provision :shell, path: 'windows/add-to-domain.ps1'
+      config.vm.provision :shell, reboot: true
+      config.vm.provision :shell, path: 'windows/provision-firewall.ps1'
+      config.vm.provision :shell, path: 'windows/provision-remote-administration-tools.ps1' if v == '2019'
+      # TODO install Apache Directory Studio
+      config.vm.provision :shell, path: 'windows/summary.ps1'
     end
-    config.vm.provider :virtualbox do |vb|
-      vb.memory = 4*1024
-    end
-      config.vm.hostname = 'windows'
-    config.vm.network 'private_network', ip: '192.168.56.3', libvirt__forward_mode: 'route', libvirt__dhcp_enabled: false
-    # config.vm.provision 'windows-sysprep'
-    config.vm.provision :shell, path: 'windows/locale.ps1'
-    config.vm.provision :shell, path: 'windows/add-to-domain.ps1'
-    config.vm.provision :shell, reboot: true
-    config.vm.provision :shell, path: 'windows/provision-firewall.ps1'
-    config.vm.provision :shell, path: 'windows/provision-remote-administration-tools.ps1'
-    # TODO install Apache Directory Studio
-    config.vm.provision :shell, path: 'windows/summary.ps1'
   end
 end
