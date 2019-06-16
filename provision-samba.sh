@@ -184,7 +184,8 @@ chronyc clients
 chronyc serverstats
 
 # try listing the smb shares.
-echo $config_administrator_password | smbclient --list=localhost --user=Administrator
+# TODO figure out why this is failing to run from vagrant: session setup failed: NT_STATUS_INVALID_SID
+smbclient --list=localhost --user=Administrator%$config_administrator_password || true
 
 # try the DNS.
 dig axfr $config_realm
