@@ -131,6 +131,10 @@ sed -i -E 's,^(OPTIONS=).+,\1"-4 -u bind",' /etc/default/bind9
 systemctl restart bind9
 systemctl restart samba-ad-dc
 
+# as an example, add a reverve dns zone for our network and hosts.
+samba-tool dns zonecreate localhost 56.168.192.in-addr.arpa --username=Administrator%$config_administrator_password
+samba-tool dns add localhost 56.168.192.in-addr.arpa 2 ptr dc.example.com --username=Administrator%$config_administrator_password
+
 #
 # install the NTP daemon and integrate it with samba.
 # see https://wiki.samba.org/index.php/Time_Synchronisation
@@ -184,3 +188,5 @@ echo $config_administrator_password | smbclient --list=localhost --user=Administ
 
 # try the DNS.
 dig axfr $config_realm
+dig dc.example.com
+dig -x 192.168.56.2
